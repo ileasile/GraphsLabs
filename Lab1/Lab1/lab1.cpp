@@ -129,7 +129,7 @@ private:
 	Graph get_pred_tree() {
 		Graph tree(N);
 		for (int i = 0; i < N; ++i) {
-			if (pred[i] != -1) {
+			if (pred[i] >= 0) {
 				tree.add_oriented_edge(pred[i], i);
 			}
 		}
@@ -180,12 +180,14 @@ public:
 
 	Graph get_bfs_tree(int x) {
 		pred.assign(N, -1);
+		pred[x] = -2;
 		bfs(x);
 		return get_pred_tree();
 	}
 
 	Graph get_dfs_tree(int x) {
 		pred.assign(N, -1);
+		pred[x] = -2;
 		dfs(x);
 		return get_pred_tree();
 	}
