@@ -95,7 +95,7 @@ Number of components: 2
 2: 4 
 
 TASK 5
-Component #0
+Component #1
 BFS tree:
 Adjacency list:
 1: 6 9 

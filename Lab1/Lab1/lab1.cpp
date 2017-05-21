@@ -239,7 +239,7 @@ int main() {
 	f << "TASK 4\n";
 	auto comps = rg.get_connectivity_components();
 	f << "Number of components: " << comps.size() << "\n";
-	for (int i = 0; i < comps.size(); ++i) {
+	for (size_t i = 0; i < comps.size(); ++i) {
 		f << i + 1 << ": ";
 		for (auto el : comps[i])
 			f << el + 1 << " ";
@@ -247,9 +247,9 @@ int main() {
 	}
 
 	f << "\nTASK 5\n";
-	for (int i = 0; i < comps.size(); ++i) {
+	for (size_t i = 0; i < comps.size(); ++i) {
 		if (comps[i].size() > 1) {
-			f << "Component #" << i << "\n";
+			f << "Component #" << i + 1 << "\n";
 			f << "BFS tree:\n";
 			auto tree = rg.get_bfs_tree(comps[i][0]);
 			tree.print_adjacency_list(f, true);
