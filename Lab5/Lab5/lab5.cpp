@@ -32,12 +32,8 @@ public:
 	EdgesList e_list;
 	AdjList a_list;
 	AdjMatrix a_mtx;
-
+	int N;
 public:
-	size_t N() {
-		return vert_original.size();
-	}
-
 	void add_edge(const Edge & e) {
 		e_list.push_back(e);
 		a_list[e.a].push_back({ e.b, e.w });
@@ -48,15 +44,7 @@ public:
 		add_edge({ x, y, w });
 	}
 
-	void init(int N, bool make_vert = true) {
-		if (make_vert) {
-			vert_index.resize(N + 1);
-			vert_original.resize(N);
-			for (int i = 0; i < N; ++i) {
-				vert_index[i + 1] = i;
-				vert_original[i] = i + 1;
-			}
-		}
+	void init(int N) {
 		a_list.resize(N);
 		a_mtx.resize(N, vector<int>(N, INF));
 	}
@@ -68,24 +56,13 @@ public:
 	Graph(int N) {
 		init(N);
 	}
-
-	Graph(const vector<int> & vert_original, const vector<int> & vert_index) {
-		this->vert_index = vert_index;
-		this->vert_original = vert_original;
-		init(N(), false);
-	}
-
+	
 	Graph(string filename, const vector<int> & vert) {
 		//constructing edges list
 		ifstream f(filename);
 		int N;
 		f >> N;
-		init(vert.size(), false);
-		vert_original = vert;
-		vert_index.resize(N + 1, -1);
-		for (size_t i = 0; i < vert.size(); ++i) {
-			vert_index[vert[i]] = i;
-		}
+		init(vert.size());
 
 		while (1) {
 			Edge e;
@@ -93,8 +70,6 @@ public:
 			if (!f)
 				break;
 			f >> e.b >> e.w;
-			e.a = vert_index[e.a];
-			e.b = vert_index[e.b];
 			if (e.a != -1 && e.b != -1)
 				add_edge(e);
 		}
@@ -114,8 +89,6 @@ public:
 			if (!f)
 				break;
 			f >> e.b >> e.w;
-			e.a = vert_index[e.a];
-			e.b = vert_index[e.b];
 			add_edge(e);
 		}
 		f.close();
@@ -132,12 +105,12 @@ public:
 	}
 	void print_adjacency_list(ostream & s, bool skip_isolated = false) {
 		s << "Adjacency list:\n";
-		for (size_t i = 0; i < N(); ++i) {
+		for (size_t i = 0; i < N; ++i) {
 			if (skip_isolated && a_list[i].empty())
 				continue;
-			s << vert_original[i] << ": ";
+			s << i << ": ";
 			for (auto & el : a_list[i])
-				s << vert_original[el.b] << "(" << el.w << ") ";
+				s << el.b << "(" << el.w << ") ";
 			s << "\n";
 		}
 		s << "\n";
