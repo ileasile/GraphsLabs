@@ -319,13 +319,10 @@ public:
 
 	vector<vector<int>> get_layers() {
 		topological_sort();
-		vector<int> layer(N(), -1);
-		layer[vert_index[num[0]]] = 0;
+		vector<int> layer(N(), 0);
 		int c = 0;
 		for (size_t j = 1; j < N(); ++j) {
 			auto ind = vert_index[num[j]];
-			if (layer[ind] == -1)
-				layer[ind] = layer[vert_index[num[j - 1]]];
 			for (auto v : a_list[ind]) {
 				layer[v] = max(layer[v], layer[ind] + 1);
 				if (c < layer[v])
@@ -340,12 +337,81 @@ public:
 
 		return res;
 	}
+
+private:
+	vector<int> * strong_comp;
+	void dfs2(int v, const Graph & gt) {
+		used[v] = true;
+		strong_comp->push_back(vert_original[v]);
+		for (auto u: gt.a_list[v])
+			if (!used[u])
+				dfs2(u, gt);
+	}
+
+	void dfs2_mod(int v, const Graph & gt, int c) {
+		used[v] = true;
+		component[v] = c;
+		for (auto u : gt.a_list[v])
+			if (!used[u])
+				dfs2_mod(u, gt, c);
+	}
+public:
+
+
+	Graph transpose() {
+		Graph gt(vert_original, vert_index);
+		for (auto & e : e_list) {
+			gt.add_edge(e.b, e.a);
+		}
+		return gt;
+	}
+
+	 auto get_strong_connected_components() {
+		vector<vector<int>> comp;
+		auto gt = transpose();
+		topological_sort();
+		used.assign(N(), false);
+		for (auto i : num) {
+			int v = vert_index[i];
+			if (!used[v]) {
+				comp.push_back({});
+				strong_comp = &comp.back();
+				dfs2(v, gt);
+			}
+		}
+
+		return comp;
+	}
+
+	 auto get_condensation() {
+		 component.resize(N());
+		 auto gt = transpose();
+		 topological_sort();
+		 used.assign(N(), false);
+		 int c = 0;
+		 for (auto i : num) {
+			 int v = vert_index[i];
+			 if (!used[v]) {
+				 dfs2_mod(v, gt, c++);
+			 }
+		 }
+
+		 Graph condensation(c);
+		 for (auto & e : e_list) {
+			 auto ca = component[e.a], cb = component[e.b];
+			 if (ca != cb && !condensation.a_mtx[ca][cb]) {
+				 condensation.add_edge(ca, cb);
+			 }
+		 }
+
+		 return condensation;
+	 }
 };
 
 int main() {
 	ofstream f("report.txt");
 	
-	f << "\nTASK 1\n";
+	f << "TASK 1\n";
 	Graph ag("input2.dat");
 	//ag.print_adjacency_matrix(f);
 	auto vert_num = ag.get_layers();
@@ -358,8 +424,22 @@ int main() {
 	}
 
 	f << "\nTASK 2\n";
+	Graph g("input3.dat");
+	//g.print_adjacency_matrix(f);
+	auto sconn = g.get_strong_connected_components();
+	f << "Strong connected components:\n";
+	for (int i = 0; i < sconn.size(); ++i) {
+		f << i + 1 << ": ";
+		for (auto & x : sconn[i]) {
+			f << x << " ";
+		}
+		f << "\n";
+	}
 
 	f << "\nTASK 3\n";
+	auto cond = g.get_condensation();
+	f << "Condensation:\n";
+	cond.print_adjacency_list(f);
 
 	f.close();
 	return 0;
