@@ -1,0 +1,19 @@
+TASK 1
+Layer form of topological sort:
+1 8 
+2 4 6 7 12 
+3 5 9 10 11 
+
+TASK 2
+Strong connected components:
+1: 1 4 2 3 
+2: 7 5 6 8 
+3: 9 12 10 11 
+
+TASK 3
+Condensation:
+Adjacency list:
+1: 2 3 
+2: 3 
+3: 
+
